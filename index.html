@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Preguntas sobre Juegos de Mesa</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('/underevil.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        #game-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+        }
+
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        .mdl-button--colored {
+            margin-top: 20px;
+        }
+
+        .restart-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div id="game-container">
+        <i class="material-icons restart-icon" id="restart-game">refresh</i>
+        <h3>Juegos de Mesa Preguntas</h3>
+        <div id="question-container"></div>
+        <button id="next-button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            Siguiente
+        </button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "¿Cuál es el objetivo del juego Monopoly?", answers: ["Ser el más rico", "Salir de la cárcel", "Construir casas"] },
+            { question: "¿Cuántas fichas hay en el juego Ludo?", answers: ["16", "12", "8"] },
+            { question: "¿En qué juego necesitas capturar al rey?", answers: ["Ajedrez", "Damas", "Scrabble"] },
+            { question: "¿Cuál es la pieza más poderosa en el ajedrez?", answers: ["Reina", "Rey", "Caballo"] },
+            { question: "¿Qué color se mueve primero en el ajedrez?", answers: ["Blanco", "Negro", "Depende"] },
+            { question: "¿Qué necesitas para ganar en Jenga?", answers: ["No derribar la torre", "Quitar más piezas", "Terminar las piezas"] },
+            { question: "¿Cuántos jugadores pueden jugar en Pictionary?", answers: ["4+", "Solo 2", "5 exactamente"] },
+            { question: "¿Qué significa Scrabble?", answers: ["Rascarse", "Crear palabras", "Contar puntos"] },
+            { question: "¿En qué juego se utiliza un tablero hexagonal?", answers: ["Catan", "Monopoly", "Damas"] },
+            { question: "¿Cuántas cartas hay en un mazo de UNO?", answers: ["108", "52", "75"] },
+            { question: "¿Cuál es el objetivo en Risk?", answers: ["Conquistar territorios", "Conseguir cartas", "Escapar del tablero"] },
+            { question: "¿Cuántos jugadores pueden jugar al Cluedo?", answers: ["6", "4", "2"] },
+            { question: "¿Qué se necesita para ganar en Trivial Pursuit?", answers: ["Conseguir los quesitos", "Acumular puntos", "Terminar primero"] },
+            { question: "¿Cuál es el juego de cartas donde se grita 'Uno'?", answers: ["UNO", "Poker", "Rummy"] },
+            { question: "¿En qué juego se lanza un dado de 20 caras?", answers: ["Dungeons & Dragons", "Monopoly", "Catan"] },
+            { question: "¿Qué objetivo tiene el juego Pandemic?", answers: ["Salvar al mundo", "Escapar", "Conquistar ciudades"] },
+            { question: "¿Cuántos jugadores pueden participar en Dixit?", answers: ["Hasta 6", "Solo 2", "Hasta 4"] },
+            { question: "¿Qué juego tiene una pieza llamada 'Caballero'?", answers: ["Ajedrez", "Risk", "Damas"] },
+            { question: "¿Cuál es el objetivo en Carcassonne?", answers: ["Construir ciudades", "Derribar fichas", "Conquistar castillos"] },
+            { question: "¿En qué juego se juega con piezas hexagonales de colores?", answers: ["Hive", "Catan", "Risk"] },
+            { question: "¿Qué color tiene la carta +4 en UNO?", answers: ["Negro", "Rojo", "Azul"] },
+            { question: "¿En qué juego se usan trenes para conectar ciudades?", answers: ["Ticket to Ride", "Monopoly", "Risk"] },
+            { question: "¿Cuántos caballos hay en un tablero de ajedrez?", answers: ["4", "2", "6"] },
+            { question: "¿Qué juego tiene cartas de 'Acusación' y 'Sospecha'?", answers: ["Cluedo", "Risk", "Monopoly"] },
+            { question: "¿Cuál es el número máximo de jugadores en Catan?", answers: ["6", "4", "8"] },
+            { question: "¿Qué se necesita para ganar en Connect 4?", answers: ["4 fichas en línea", "5 fichas en línea", "3 fichas en línea"] },
+            { question: "¿Qué piezas se colocan al principio en las esquinas del tablero de ajedrez?", answers: ["Torre", "Alfil", "Caballo"] },
+            { question: "¿En qué juego se utilizan cartas de recursos como madera y ladrillo?", answers: ["Catan", "Monopoly", "Risk"] },
+            { question: "¿Qué significa ganar en Scrabble?", answers: ["Tener la mayor puntuación", "Terminar primero", "Tener más palabras"] },
+            { question: "¿Qué color se mueve primero en las damas?", answers: ["Negro", "Rojo", "Blanco"] },
+            { question: "¿Qué juego utiliza fichas numeradas del 1 al 13?", answers: ["Rummikub", "Monopoly", "Dixit"] },
+            { question: "¿Qué tipo de juego es Under Evil?", answers: ["Cooperativo", "Roles Ocultos", "Cluedo"] },
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let askedQuestions = [];
+
+        function startGame() {
+            askedQuestions = [];
+            score = 0;
+            document.getElementById('result').innerText = '';
+            document.getElementById('next-button').style.display = 'block';
+            askQuestion();
+        }
+
+        function askQuestion() {
+            if (askedQuestions.length < 3) {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * questions.length);
+                } while (askedQuestions.includes(randomIndex));
+
+                askedQuestions.push(randomIndex);
+                currentQuestionIndex = randomIndex;
+
+                const questionObj = questions[randomIndex];
+                document.getElementById('question-container').innerHTML = `
+                    <p>${questionObj.question}</p>
+                    ${questionObj.answers.map((answer, index) => `
+                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-${index}">
+                            <input type="radio" id="option-${index}" class="mdl-radio__button" name="answer" value="${answer}">
+                            <span class="mdl-radio__label">${answer}</span>
+                        </label><br>
+                    `).join('')}
+                `;
+                componentHandler.upgradeDom();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('question-container').innerHTML = '';
+            document.getElementById('next-button').style.display = 'none';
+            document.getElementById('result').innerText = `Has obtenido ${score} de 3 respuestas correctas.`;
+        }
+
+        document.getElementById('next-button').addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                if (selectedOption.value === questions[currentQuestionIndex].answers[0]) {
+                    score++;
+                }
+                askQuestion();
+            } else {
+                alert('Por favor, selecciona una respuesta.');
+            }
+        });
+
+        document.getElementById('restart-game').addEventListener('click', startGame);
+
+        startGame();
+    </script>
+</body>
+</html>
